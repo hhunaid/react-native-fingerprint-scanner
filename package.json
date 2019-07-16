@@ -41,9 +41,6 @@
     "clean:node": "rm -rf node_modules package-lock.json examples/node_modules examples/package-lock.json",
     "clean:android": "rm -rf android/.gradle android/build examples/android/.gradle examples/android/build examples/android/app/build",
     "clean:android:gradle": "cd android && ./gradlew clean && cd .. && cd examples/android && ./gradlew clean",
-    "clean:ios": "rm -rf ios/build examples/ios/build",
-    "preinstall": "npm run clean",
-    "install": "cd examples && npm install",
-    "postinstall": "npm run clean:android:gradle"
+    "clean:ios": "rm -rf ios/build examples/ios/build"
   }
 }
