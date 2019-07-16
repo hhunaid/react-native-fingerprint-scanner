@@ -4,10 +4,10 @@
 [![Version](https://img.shields.io/npm/v/react-native-fingerprint-scanner.svg)](https://www.npmjs.com/package/react-native-fingerprint-scanner)
 [![NPM](https://img.shields.io/npm/dm/react-native-fingerprint-scanner.svg)](https://www.npmjs.com/package/react-native-fingerprint-scanner)
 
-React Native Fingerprint Scanner is a [React Native](http://facebook.github.io/react-native/) library for authenticating users with Fingerprint, Touch ID and Face ID.
+React Native Fingerprint Scanner is a [React Native](http://facebook.github.io/react-native/) library for authenticating users with Fingerprint (TouchID).
 
 ### iOS Version
-The usage of the TouchID and FaceID is based on a framework, named **Local Authentication**.
+The usage of the TouchID is based on a framework, named **Local Authentication**.
 
 It provides a **Default View** that prompts the user to place a finger to the iPhone’s button for scanning.
 
@@ -52,7 +52,7 @@ Samsung and MeiZu's Fingerprint SDK supports most devices which system versions 
 
 #### Android
 
-1. Open up `android/app/src/main/java/[...]/MainActivity.java`
+1. Open up `android/app/src/main/java/[...]/MainApplication.java`
   - Add `import com.hieuvp.fingerprint.ReactNativeFingerprintScannerPackage;` to the imports at the top of the file
   - Add `new ReactNativeFingerprintScannerPackage()` to the list returned by the `getPackages()` method
 2. Append the following lines to `android/settings.gradle`:
@@ -64,6 +64,23 @@ Samsung and MeiZu's Fingerprint SDK supports most devices which system versions 
   	```
     compile project(':react-native-fingerprint-scanner')
   	```
+
+### App Permissions
+
+Add the following permissions to their respective files:
+
+In your `AndroidManifest.xml`:
+
+```xml
+<uses-permission android:name="android.permission.USE_FINGERPRINT" />
+```
+
+In your `Info.plist`:
+
+```xml
+<key>NSFaceIDUsageDescription</key>
+<string>$(PRODUCT_NAME) requires FaceID access to allows you quick and secure access.</string>
+```
 
 ### Extra Configuration
 
@@ -77,7 +94,7 @@ Samsung and MeiZu's Fingerprint SDK supports most devices which system versions 
           targetSdkVersion 25
     ```
 
-2. Add necessary rules to `android/app/proguard-rules.pro`
+2. Add necessary rules to `android/app/proguard-rules.pro` if you are using proguard:
     ```
     # MeiZu Fingerprint
 
@@ -96,7 +113,8 @@ Samsung and MeiZu's Fingerprint SDK supports most devices which system versions 
 
 **iOS Implementation**
 ```javascript
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { AlertIOS } from 'react-native';
 import FingerprintScanner from 'react-native-fingerprint-scanner';
 
@@ -129,7 +147,9 @@ export default FingerprintPopup;
 
 **Android Implementation**
 ```javascript
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+
 import {
   Alert,
   Image,
@@ -223,8 +243,8 @@ export default FingerprintPopup;
 Checks if Fingerprint Scanner is able to be used by now.
 
 - Returns a `Promise<string>`
-- `biometryType: String` - the type of biometric authentication supported by the device.
-- `error: FingerprintScannerError { name, message }` - the reason of failure.
+- `biometryType: String` - The type of biometric authentication supported by the device.
+- `error: FingerprintScannerError { name, message, biometric }` - The name and message of failure and the biometric type in use.
 
 ```javascript
 componentDidMount() {
@@ -279,7 +299,7 @@ componentDidMount() {
 ```
 
 ### `release()`: (Android)
-Stops fingerprint scanner listener and optimizes memory.
+Stops fingerprint scanner listener, releases cache of internal state in native code.
 
 - Returns a `Void`
 
@@ -291,33 +311,28 @@ componentWillUnmount() {
 
 ### `Types of Biometrics`
 
-| Value |
-|---|
-| FINGERPRINT |
-| FACE |
+| Value | OS |
+|---|---|
+| Touch ID | iOS |
+| Face ID | iOS |
+| Fingerprint | Android |
 
 ### `Errors`
 
 | Name | Message |
 |---|---|
-| AuthenticationFailed | Authentication was not successful because the user failed to provide valid credentials |
 | AuthenticationNotMatch | No match |
-| DeviceLocked | The device is locked temporarily |
-| FingerprintScannerNotAvailable | Authentication could not start because Fingerprint Scanner is not available on the device |
-| FingerprintScannerNotEnrolled | Authentication could not start because Fingerprint Scanner has no enrolled fingers |
-| FingerprintScannerNotSupported | Device does not support Fingerprint Scanner |
-| FingerprintScannerUnknownError | Could not authenticate for an unknown reason |
-| PasscodeNotSet | Authentication could not start because the passcode is not set on the device |
-| SystemCancel | Authentication was canceled by system - e.g. if another application came to foreground while the authentication dialog was up |
+| AuthenticationFailed | Authentication was not successful because the user failed to provide valid credentials |
 | UserCancel | Authentication was canceled by the user - e.g. the user tapped Cancel in the dialog |
 | UserFallback | Authentication was canceled because the user tapped the fallback button (Enter Password) |
+| SystemCancel | Authentication was canceled by system - e.g. if another application came to foreground while the authentication dialog was up |
+| PasscodeNotSet | Authentication could not start because the passcode is not set on the device |
+| FingerprintScannerNotAvailable | Authentication could not start because Fingerprint Scanner is not available on the device |
+| FingerprintScannerNotEnrolled | Authentication could not start because Fingerprint Scanner has no enrolled fingers |
+| FingerprintScannerUnknownError | Could not authenticate for an unknown reason |
+| FingerprintScannerNotSupported | Device does not support Fingerprint Scanner |
+| DeviceLocked | Authentication was not successful, the device currently in a lockout of 30 seconds |
 
-## MIT License
+## License
 
-Copyright (C) 2017 Van Phu Hieu
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+MIT
